@@ -18,7 +18,7 @@
         </header>
         <section>
             <div class="container p-3">
-                <div class="row justify-content-center mb-2">
+                <div class="row d-flex justify-content-center mb-2">
                     <div class="text-center mb-3">
                         <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#modalAdicionarComida">Adicionar</button>
     
@@ -69,12 +69,11 @@
                                 <th data-th-text="${comida.id}"></th>
                                 <td data-th-text="${comida.nome}"></td>
                                 <td data-th-text="${comida.preco}"></td>
-                                <td><a class="btn btn-primary" href="/editar_comida">Editar</a></td>
-                                <td><button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalExcluirComida">Remover</button></td>
+                                <td><a class="btn btn-primary" th:href="'/editar_comida/' + ${comida.id}">Editar</a></td>
+                                <td><a class="btn btn-outline-danger" th:href="'/deletar_comida/' + ${comida.id}" onclick="return confirm('Tem certeza que deseja excluir?')">Remover</a></td>
                             </tr>
                         </tbody>
                     </table>
-                    
                 </div>
             </div>
         </section>

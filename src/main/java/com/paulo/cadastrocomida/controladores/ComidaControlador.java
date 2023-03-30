@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.paulo.cadastrocomida.modelos.Comida;
@@ -21,21 +20,35 @@ public class ComidaControlador {
     private List<Comida> comidas = new ArrayList<>();
         
     @GetMapping("/lista")
-    public String verLista() {
-        return "inicio"; //retorna a página html na pasta templates com o nome da string
+    public ModelAndView verLista() {
+        ModelAndView modelViewListar = new ModelAndView("inicio");
+        modelViewListar.addObject("comidas", comidas);
+
+        return modelViewListar; 
+        //return "inicio"; //retorna a página html na pasta templates com o nome da string
     }
 
-    @GetMapping("/editar_comida")
-    public String verFormEdicao() {
-        return "editar_comida"; 
+    @GetMapping("/editar_comida/{id}")
+    public ModelAndView verFormEdicao(@PathVariable long id) {
+        Comida comida = comidas.get((int)id - 1);
+
+        ModelAndView modelViewEditar = new ModelAndView("editar_comida");
+        modelViewEditar.addObject("comida", comida);
+
+        return modelViewEditar; 
     }
 
     //ModelAndView: Permite retornar uma view e um modelo ao mesmo tempo.
     
     @PostMapping("/lista")
     public ModelAndView adicionarComida(Comida comida) {
-        comida.setId(comidas.size() + 1); //cria um id para a comida.
-        comidas.add(comida); //adiciona à lista.
+        if (comida.getId() == 0) { //verifica se é edição.
+            comida.setId(comidas.size() + 1); //cria um id para a comida.
+
+            comidas.add(comida); //adiciona à lista.
+        } else {
+            comidas.set((int)comida.getId() - 1, comida); //atualiza a comida
+        }
 
         ModelAndView modelView = new ModelAndView("inicio");
         modelView.addObject("comidas", comidas);
@@ -44,24 +57,11 @@ public class ComidaControlador {
         //return "redirect:/comidas" //redireciona ao endpoint GET de /comidas. Dessa forma, garante que a view seja "reiniciada" para um novo ciclo de requisições.
     }
 
-    @PutMapping("/editar_comida")
-    public ModelAndView editarComida(Comida comida) {
-        /* Comida comidaAntiga = comidas.get(comidas.indexOf(comida));
+    @GetMapping("/deletar_comida/{id}")
+    public ModelAndView deletarComida(@PathVariable long id) {
+        comidas.remove(comidas.indexOf(comidas.get((int)id - 1)));
 
-        comidaAntiga.setNome(comida.getNome());
-        comidaAntiga.setPreco(comida.getPreco()); */
-
-        ModelAndView modelView = new ModelAndView("inicio");
-        modelView.addObject("comidas", comidas);
-
-        return modelView; //redireciona ao endpoint GET de /comidas. Dessa forma, garante que a view seja "reiniciada" para um novo ciclo de requisições.
-    }
-
-    @DeleteMapping("/deletar_comida")
-    public ModelAndView deletarComida(long id) {
-        comidas.remove(comidas.indexOf(comidas.get((int)id)));
-
-        ModelAndView modelView = new ModelAndView("inicio");
+        ModelAndView modelView = new ModelAndView("redirect:/lista");
         modelView.addObject("comidas", comidas);
 
         return modelView;
